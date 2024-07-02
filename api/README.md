@@ -1,1 +1,0 @@
-# solidgate-software-engineering-school

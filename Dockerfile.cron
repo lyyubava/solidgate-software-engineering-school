@@ -1,0 +1,6 @@
+FROM golang:1.21.4 AS build
+WORKDIR /app
+COPY . .
+RUN go mod download
+WORKDIR /app/email_cron
+CMD ["go", "run", "main.go"]

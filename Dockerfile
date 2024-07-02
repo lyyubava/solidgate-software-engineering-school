@@ -1,4 +1,4 @@
-FROM golang:1.20 AS build
+FROM golang:1.21.4 AS build
 RUN useradd -u 1001 -m gouser
 WORKDIR /app
 COPY . .
@@ -10,7 +10,7 @@ RUN apk add --no-cache bash
 WORKDIR /
 COPY --from=build /main /main
 USER 1001
-EXPOSE 8080
+EXPOSE 80
 ENTRYPOINT ["/main"]
 
 

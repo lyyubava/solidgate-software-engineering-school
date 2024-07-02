@@ -1,0 +1,52 @@
+version: "3"
+volumes:
+  db:
+services:
+  api:
+    build: .
+    ports:
+      - "80:80"
+    environment:
+      DATABASE_CONNECTION_STRING: "host=db user=apiuser password=example dbname=example port=5432 sslmode=disable"
+      API_PORT: 80
+      EXCHANGERATE_API_URL: "https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json"
+    depends_on:
+      - db
+      - migrate
+    restart: always
+
+  migrate:
+    image: arigaio/atlas:latest
+    command: >
+      migrate apply --url "postgres://apiuser:example@db:5432/example?search_path=public&sslmode=disable"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./migrations/:/migrations
+
+  db:
+    image: postgres:13.10
+    healthcheck:
+      test: pg_isready
+    environment:
+      POSTGRES_USER: apiuser
+      POSTGRES_DB: example
+      POSTGRES_PASSWORD: example
+    ports:
+      - "5432:5432"
+
+  email_cron:
+    build:
+      context: .
+      dockerfile: Dockerfile.cron
+    environment:
+      MAIL_PASSWORD: "d d o f n u e v s i g h y e w f"
+      MAIL_FROM: "testblogapi1@gmail.com"
+      DATABASE_CONNECTION_STRING: "host=db user=apiuser password=example dbname=example port=5432 sslmode=disable"
+      SMTP_URI: "smtp.gmail.com:587"
+      SMTP_HOST: "smtp.gmail.com"
+    depends_on:
+      - db
+      - api
+    restart: always

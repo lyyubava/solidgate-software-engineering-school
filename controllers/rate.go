@@ -20,9 +20,9 @@ type CurrencyInfo struct {
 	Txt          string  `json:"txt"`
 }
 
-type currencyData []CurrencyInfo
+type CurrencyData []CurrencyInfo
 
-func (c currencyData) get(currencyCode string) CurrencyInfo {
+func (c CurrencyData) Get(currencyCode string) CurrencyInfo {
 	for _, currencyInfo := range c {
 		if currencyInfo.Currency == currencyCode {
 			return currencyInfo
@@ -40,7 +40,7 @@ func Rate(c *gin.Context) {
 		return
 	}
 
-	var currencyDataResp currencyData
+	var currencyDataResp CurrencyData
 	response, err := http.Get(os.Getenv("EXCHANGERATE_API_URL"))
 	defer response.Body.Close()
 	if err != nil {
@@ -60,7 +60,7 @@ func Rate(c *gin.Context) {
 		return
 	}
 
-	resp := currencyDataResp.get("USD")
+	resp := currencyDataResp.Get("USD")
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid status value"})
 		return
